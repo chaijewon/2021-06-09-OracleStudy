@@ -159,6 +159,35 @@ public class EmpDAO {
      }
      // SEELCT * FROM emp WHERE ename LIKE '%()%'
      // 오라클 => 웹과 관련 오라클 
+     // 영화 등록 
+     public void movieInsert(Movie movie)
+     {
+    	 try
+    	 {
+    		 getConnection();//연결 
+    		 // 2. SQL문장 만들기 
+    		 String sql="INSERT INTO movie VALUES(?,?,?,?,?,?,?,?)";
+    		 ps=conn.prepareStatement(sql);
+    		 // 실행전 => ?에 값을 채워서 실행 
+    		 // genre,poster,actor,regdate,grade,director;
+    		 ps.setInt(1, movie.getMno());
+    		 ps.setString(2, movie.getTitle());
+    		 ps.setString(3, movie.getGenre());
+    		 ps.setString(4, movie.getPoster());
+    		 ps.setString(5, movie.getActor());
+    		 ps.setString(6, movie.getRegdate());
+    		 ps.setString(7, movie.getGrade());
+    		 ps.setString(8, movie.getDirector());
+    		 ps.executeUpdate();
+    	 }catch(Exception ex)
+    	 {
+    		 ex.printStackTrace(); // 에러처리
+    	 }
+    	 finally
+    	 {
+    		 disConnection();//오라클 닫기 
+    	 }
+     }
 }
 
 
