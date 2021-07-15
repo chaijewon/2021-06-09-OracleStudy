@@ -87,6 +87,43 @@ public class MusicDAO {
 	   }
    }
    // 5. 데이터 등록 => 메론 
+   /*
+    *   NO     NOT NULL NUMBER         
+		POSTER          VARCHAR2(1000) 
+		TITLE           VARCHAR2(200)  
+		SINGER          VARCHAR2(100)  
+		ALBUM           VARCHAR2(200)  
+		OK              VARCHAR2(10)   
+		KEY             VARCHAR2(100) 
+    */
+   public void melonInsert(MelonVO vo)
+   {
+	   try
+	   {
+		   //1. 연결
+		   getConnection();
+		   //2. SQL문장 
+		   String sql="INSERT INTO melon_cjw VALUES(?,?,?,?,?,?,?)";
+		   //3. 값채우기
+		   ps=conn.prepareStatement(sql);
+		   ps.setInt(1, vo.getNo());
+		   ps.setString(2, vo.getPoster());
+		   ps.setString(3, vo.getTitle());
+		   ps.setString(4, vo.getSinger());
+		   ps.setString(5, vo.getAlbum());
+		   ps.setString(6, vo.getOk());
+		   ps.setString(7, vo.getKey());
+		   //4. 실행
+		   ps.executeUpdate();
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();//에러처리 
+	   }
+	   finally
+	   {
+		   // 오라클 닫기
+	   }
+   }
 }
 
 

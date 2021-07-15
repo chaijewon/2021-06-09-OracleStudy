@@ -111,14 +111,96 @@ public class MusicMain {
 		}catch(Exception ex) {}
 		return key;
 	}
+	/*
+	 * NO     NOT NULL NUMBER         
+	POSTER          VARCHAR2(1000) 
+	TITLE           VARCHAR2(200)  
+	SINGER          VARCHAR2(100)  
+	ALBUM           VARCHAR2(200)  
+	OK              VARCHAR2(10)   
+	KEY             VARCHAR2(100)
+	<td><div class="wrap">
+	<a href="javascript:melon.link.goAlbumDetail('10638275');" title="MSG워너비 1집" class="image_typeAll">
+	<img onerror="WEBPOCIMG.defaultAlbumImg(this);" width="60" height="60" src="https://cdnimg.melon.co.kr/cm2/album/images/106/38/275/10638275_20210625172521_500.jpg/melon/resize/120/quality/80/optimize" alt="MSG워너비 1집 - 페이지 이동"/>
+	<span class="bg_album_frame"></span>
+	</a>
+	</div></td>
+	<td><div class="wrap">
+		<a href="javascript:melon.link.goSongDetail('33625988');" title="바라만 본다 곡정보" class="btn button_icons type03 song_info"><span class="none">곡정보</span></a>
+		</div></td>
+		<td><div class="wrap">
+		<div class="wrap_song_info">
+								<div class="ellipsis rank01"><span>
+	<a href="javascript:melon.play.playSong('19030101',33625988);" title="바라만 본다 재생">바라만 본다</a>
+								</span></div>
+								
+								<br>
+								<div class="ellipsis rank02">
+									
+									
+									<a href="javascript:melon.link.goArtistDetail('2939212');" title="MSG워너비(M.O.M) - 페이지 이동" >MSG워너비(M.O.M)</a><span class="checkEllipsis" style="display:none"><a href="javascript:melon.link.goArtistDetail('2939212');" title="MSG워너비(M.O.M) - 페이지 이동" >MSG워너비(M.O.M)</a></span>
+								</div>
+								
+							</div>
+						</div></td>
+						<td><div class="wrap">
+							<div class="wrap_song_info">
+								<div class="ellipsis rank03">
+									<a href="javascript:melon.link.goAlbumDetail('10638275');" title="MSG워너비 1집 - 페이지 이동">MSG워너비 1집</a>
+								</div>
+							</div>
+						</div></td>
+						<td><div class="wrap">
+							<button type="button" class="button_etc like" title="바라만 본다 좋아요" data-song-no="33625988" data-song-menuid="19030101">
+								<span class="odd_span">좋아요</span>
+								<span class="cnt">
+									<span class="none">총건수</span>
+									0
+								</span>
+							</button>
+						</div></td>
+	 */
 	public void melonAllData()
 	{
-		
+		try
+		{
+			MusicDAO dao=new MusicDAO();
+			int k=1;
+			Document doc=Jsoup.connect("https://www.melon.com/chart/index.htm").get();
+			Elements poster=doc.select("a.image_typeAll img");
+			Elements title=doc.select("div.rank01 a");
+			Elements singer=doc.select("div.rank02 span.checkEllipsis a");
+			Elements album=doc.select("div.rank03 a");
+			Elements ok=doc.select("span.cnt");
+			for(int i=0;i<title.size();i++)
+			{
+				System.out.println("번호:"+k);
+				System.out.println("제목:"+title.get(i).text());
+				System.out.println("가수:"+singer.get(i).text());
+				System.out.println("앨범:"+album.get(i).text());
+				System.out.println("좋아요:"+ok.get(i).text());
+				System.out.println("포스터:"+poster.get(i).attr("src"));
+				//System.out.println("KEY:"+youtubeGetKey(title.get(i).text()));
+				System.out.println("===================================");
+				MelonVO vo=new MelonVO();
+				vo.setNo(k);
+				vo.setPoster(poster.get(i).attr("src"));
+				vo.setTitle(title.get(i).text());
+				vo.setSinger(singer.get(i).text());
+				vo.setAlbum(album.get(i).text());
+				int r=(int)(Math.random()*10000)+1000000;
+				vo.setOk(String.valueOf(r));
+				vo.setKey(youtubeGetKey(title.get(i).text()));
+				dao.melonInsert(vo);
+				k++;
+			}
+		}catch(Exception ex) {ex.printStackTrace();}
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
         MusicMain m=new MusicMain();
-        m.genieAllData();
+        //m.genieAllData();
+        m.melonAllData();
 	}
 
 }
