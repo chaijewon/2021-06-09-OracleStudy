@@ -156,6 +156,46 @@ public class BoardDAO {
 	   return total;
    }
    //3. 내용보기 => SELECT(데이터 읽기) , UPDATE(조회수 증가) 
+   public BoardVO boardDetail(int no)
+   {
+	   BoardVO vo=new BoardVO();
+	   try
+	   {
+		   // 1. 연결
+		   getConnection();
+		   // 2. SQL문장 (조회수 증가) +=,++(X) => hit=hit+1
+		   String sql="UPDATE board SET "
+				     +"hit=hit+1 "
+				     +"WHERE no="+no;
+		   ps=conn.prepareStatement(sql);
+		   ps.executeUpdate(); // UPDATE 실행 => COMMIT
+		   // 3. 실행
+		   sql="SELECT no,name,subject,content,regdate,hit "
+			  +"FROM board "
+			  +"WHERE no="+no; // 항상 => 중복이 없는 데이터를 가지고 있어야 한다 
+		      // no NUMBER => PRIMARY KEY => 자동 증가 => SEQUENCE
+		   ps=conn.prepareStatement(sql);
+		   ResultSet rs=ps.executeQuery();
+		   rs.next();
+		   // 데이터를 받는다
+		   vo.setNo(rs.getInt(1));
+		   vo.setName(rs.getString(2));
+		   vo.setSubject(rs.getString(3));
+		   vo.setContent(rs.getString(4));
+		   vo.setRegdate(rs.getDate(5));
+		   vo.setHit(rs.getInt(6));
+		   rs.close();
+		   
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+	   return vo;
+   }
    //4. 게시물 추가 => INSERT
    //5. 수정하기 => SELECT(본인여부 확인:비밀번호 확인) , UPDATE
    //6. 삭제하기 => SELECT(본인여부 확인:비밀번호 확인) , DELETE

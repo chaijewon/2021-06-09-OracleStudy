@@ -76,11 +76,41 @@ public class BoardList extends HttpServlet {
 		out.println("<h1 class=text-center>자유게시판</h1>");
 		out.println("<table class=table>");
 		out.println("<tr class=danger>");// info , danger , warning , 
-		out.println("<th width=10%>번호</th>");
-		out.println("<th width=45%>제목</th>");
-		out.println("<th width=15%>이름</th>");
-		out.println("<th width=20%>작성일</th>");
-		out.println("<th width=10%>조회수</th>");
+		out.println("<th width=10% class=text-center>번호</th>");
+		out.println("<th width=45% class=text-center>제목</th>");
+		out.println("<th width=15% class=text-center>이름</th>");
+		out.println("<th width=20% class=text-center>작성일</th>");
+		out.println("<th width=10% class=text-center>조회수</th>");
+		out.println("</tr>");
+		// 데이터 출력 
+		// http://localhost:8080/BoardProject/BoardList?page=2
+		BoardDAO dao=new BoardDAO();
+		//1. page를 받아본다 
+		String strPage=request.getParameter("page"); // URL을 통해서 
+		// 첫페이지는 default 
+		if(strPage==null)
+			strPage="1";
+		int curpage=Integer.parseInt(strPage); // 현재 보고 있는 페이지 
+		int totalpage=dao.boardTotalPage(); // 총페이지 
+		ArrayList<BoardVO> list=dao.boardListData(curpage);
+		for(BoardVO vo:list)
+		{
+			out.println("<tr>");// info , danger , warning , 
+			out.println("<td width=10% class=text-center>"+vo.getNo()+"</td>");
+			out.println("<td width=45%><a href=BoardDetail?no="+vo.getNo()+">"+vo.getSubject()+"</a></td>");// 글자수일정하지 않는 경우 왼쪽정렬
+			out.println("<td width=15% class=text-center>"+vo.getName()+"</td>");
+			out.println("<td width=20% class=text-center>"+vo.getRegdate().toString()+"</td>");
+			out.println("<td width=10% class=text-center>"+vo.getHit()+"</td>");
+			out.println("</tr>");
+		}
+		out.println("</table>");
+		out.println("<table class=table>");
+		out.println("<tr>");
+		out.println("<td class=text-right>");
+		out.println("<a href=BoardList?page="+(curpage>1?curpage-1:curpage)+" class=\"btn btn-lg btn-primary\">이전</a>");
+		out.println(curpage+" page / "+totalpage+" pages");
+		out.println("<a href=BoardList?page="+(curpage<totalpage?curpage+1:curpage)+" class=\"btn btn-lg btn-primary\">다음</a>");
+		out.println("</td>");
 		out.println("</tr>");
 		out.println("</table>");
 		out.println("</div>");
