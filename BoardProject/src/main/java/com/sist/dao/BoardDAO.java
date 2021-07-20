@@ -216,6 +216,7 @@ public class BoardDAO {
 		   // 서브쿼리 : SELECT , table,column,INSERT,UPDATE,DELETE
 		   String sql="INSERT INTO board(no,name,subject,content,pwd) "
 			  +"VALUES((SELECT NVL(MAX(no)+1,1) FROM board),?,?,?,?)";
+		   // MyBatis => column,table => $  , 일반 데이터 #
 		   ps=conn.prepareStatement(sql);
 		   ps.setString(1, vo.getName()); // String => ''
 		   ps.setString(2, vo.getSubject());
@@ -266,6 +267,8 @@ public class BoardDAO {
 		   String sql="SELECT no,subject,name,regdate,hit "
 				     +"FROM board "
 				     +"WHERE "+fs+" LIKE '%'||?||'%'";// 오라클과 다르다 
+		   //  ? fs ==> 'name' LIKE  (name LIKE) => ?는 데이터값을 대입
+		   //  table명,컬럼명 => 그냥사용
 		   //3. 실행후 결과값 받기
 		   ps=conn.prepareStatement(sql);
 		   ps.setString(1, ss);
