@@ -116,6 +116,16 @@ public class BoardList extends HttpServlet {
 		out.println("</table>");
 		out.println("<table class=table>");
 		out.println("<tr>");
+		out.println("<td class=text-left>");
+		out.println("Search:");
+		out.println("<select name=fs class=input-sm>");
+		out.println("<option value=name>이름</option>");
+		out.println("<option value=subject>제목</option>");
+		out.println("<option value=content>내용</option>");
+		out.println("</select>");
+		out.println("<input type=text name=ss size=10 class=input-sm>");
+		out.println("<input type=submit value=검색 class=\"btn btn-sm btn-success\">");
+		out.println("</td>");
 		out.println("<td class=text-right>");
 		out.println("<a href=BoardList?page="+(curpage>1?curpage-1:curpage)+" class=\"btn btn-lg btn-primary\">이전</a>");
 		out.println(curpage+" page / "+totalpage+" pages");

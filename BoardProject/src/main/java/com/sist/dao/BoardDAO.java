@@ -235,8 +235,94 @@ public class BoardDAO {
    }
    //5. 수정하기 => SELECT(본인여부 확인:비밀번호 확인) , UPDATE
    //6. 삭제하기 => SELECT(본인여부 확인:비밀번호 확인) , DELETE
+   public void boardDelete(int no)
+   {
+	   try
+	   {
+		   getConnection();
+		   // 비밀번호 검색 
+		   String sql="DELETE FROM board WHERE no="+no;
+		   ps=conn.prepareStatement(sql);
+		   ps.executeUpdate();
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+   }
    //7. 검색 => SELECT (LIKE)  => WHERE title '%'||값||'%' => 자바에서 LIKE사용시 
-   
+   public ArrayList<BoardVO> boardFind(String fs,String ss)
+   {
+	   ArrayList<BoardVO> list=new ArrayList<BoardVO>();
+	   try
+	   {
+		   //1. 연결
+		   getConnection();
+		   //2. SQL문장 
+		   // fs= name,subject ,content
+		   String sql="SELECT no,subject,name,regdate,hit "
+				     +"FROM board "
+				     +"WHERE "+fs+" LIKE '%'||?||'%'";// 오라클과 다르다 
+		   //3. 실행후 결과값 받기
+		   ps=conn.prepareStatement(sql);
+		   ps.setString(1, ss);
+		   ResultSet rs=ps.executeQuery();
+		   
+		   //4. ArrayList에 값 채우기
+		   while(rs.next())
+		   {
+			   BoardVO vo=new BoardVO();
+			   vo.setNo(rs.getInt(1));
+			   vo.setSubject(rs.getString(2));
+			   vo.setName(rs.getString(3));
+			   vo.setRegdate(rs.getDate(4));
+			   vo.setHit(rs.getInt(5));
+			   // 저장
+			   list.add(vo);
+		   }
+		   rs.close();
+	   }catch(Exception ex)
+	   {
+		  ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+	   return list;
+   }
+   public int boardFindCount(String fs,String ss)
+   {
+	   int count=0;
+	   try
+	   {
+		   //1. 연결
+		   getConnection();
+		   //2. SQL문장 
+		   // fs= name,subject ,content
+		   String sql="SELECT COUNT(*) "
+				     +"FROM board "
+				     +"WHERE "+fs+" LIKE '%'||?||'%'";// 오라클과 다르다 
+		   //3. 실행후 결과값 받기
+		   ps=conn.prepareStatement(sql);
+		   ps.setString(1, ss);
+		   ResultSet rs=ps.executeQuery();
+		   rs.next();
+		   count=rs.getInt(1);
+		   rs.close();
+	   }catch(Exception ex)
+	   {
+		  ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+	   return count;
+   }
    
 }
 

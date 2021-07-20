@@ -26,6 +26,9 @@ public class BoardInsert extends HttpServlet {
 		out.println("<div class=row>");
 		out.println("<h1 class=text-center>글쓰기</h1>");
 		out.println("<div style=\"height:30px\"></div>");
+		
+		out.println("<form method=post action=BoardInsert>");
+		// BoardInsert가 가지고 있는 doPost를 호출한다 
 		out.println("<table class=table>");
 		
 		out.println("<tr>");
@@ -56,6 +59,7 @@ public class BoardInsert extends HttpServlet {
 	    out.println("</tr>");
 		
 		out.println("</table>");
+		out.println("</form>");
 		out.println("</div>");
 		out.println("</div>");
 		out.println("</body>");
@@ -64,7 +68,29 @@ public class BoardInsert extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// BoardList이동 
+		// BoardList이동
+		try
+		{
+			// 한글 깨진다 => 인코딩 => 디코딩 (데이터가 담겨있는 곳) request
+			request.setCharacterEncoding("UTF-8"); // JSP , Spring , Kotlin
+		}catch(Exception ex) {}
+		BoardVO vo=new BoardVO();
+		vo.setName(request.getParameter("name"));
+		vo.setSubject(request.getParameter("subject"));
+		vo.setContent(request.getParameter("content"));
+		vo.setPwd(request.getParameter("pwd"));
+		// DAO로 전송 => 데이터 추가 
+		BoardDAO dao=new BoardDAO();
+		dao.boardInsert(vo);
+		// 화면 이동 => BoardList
+		response.sendRedirect("BoardList");
 	}
 
 }
+
+
+
+
+
+
+

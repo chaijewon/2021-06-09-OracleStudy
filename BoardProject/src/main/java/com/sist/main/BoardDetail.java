@@ -66,7 +66,8 @@ public class BoardDetail extends HttpServlet {
 				out.println("<tr>");
 				out.println("<td colspan=4 class=text-right>");
 				out.println("<a href=# class=\"btn btn-xs btn-success\">수정</a>");
-				out.println("<a href=# class=\"btn btn-xs btn-danger\">삭제</a>");
+				// 웹 => URL을 통해서 전송 ==> 이동할 파일명?변수=값&변수=값 ==> 값(request)
+				out.println("<a href=BoardDelete?no="+vo.getNo()+" class=\"btn btn-xs btn-danger\">삭제</a>");
 				out.println("<a href=BoardList class=\"btn btn-xs btn-warning\">목록</a>");
 				out.println("</td>");
 				out.println("</tr>");
