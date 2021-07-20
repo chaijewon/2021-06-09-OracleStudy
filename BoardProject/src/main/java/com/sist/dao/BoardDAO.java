@@ -197,6 +197,42 @@ public class BoardDAO {
 	   return vo;
    }
    //4. 게시물 추가 => INSERT
+   public void boardInsert(BoardVO vo)
+   {
+	   try
+	   {
+		   //1. 연결
+		   getConnection();
+		   //2. SQL문장 
+		   // 2-1 게시물 번호의 최대값 +1 
+		   //String sql="SELECT NVL(MAX(no)+1,1) FROM board";// 자동증가번호 
+		   //ps=conn.prepareStatement(sql);
+		   // 결과값 받기 
+		   //ResultSet rs=ps.executeQuery();
+		   //rs.next();
+		   //int max=rs.getInt(1);
+		   //rs.close();
+		   // 연결 <=> 닫기
+		   // 서브쿼리 : SELECT , table,column,INSERT,UPDATE,DELETE
+		   String sql="INSERT INTO board(no,name,subject,content,pwd) "
+			  +"VALUES((SELECT NVL(MAX(no)+1,1) FROM board),?,?,?,?)";
+		   ps=conn.prepareStatement(sql);
+		   ps.setString(1, vo.getName()); // String => ''
+		   ps.setString(2, vo.getSubject());
+		   ps.setString(3, vo.getContent());
+		   ps.setString(4, vo.getPwd());
+		   
+		   //3. SQL문장 실행
+		   ps.executeUpdate();// commit()
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+   }
    //5. 수정하기 => SELECT(본인여부 확인:비밀번호 확인) , UPDATE
    //6. 삭제하기 => SELECT(본인여부 확인:비밀번호 확인) , DELETE
    //7. 검색 => SELECT (LIKE)  => WHERE title '%'||값||'%' => 자바에서 LIKE사용시 
