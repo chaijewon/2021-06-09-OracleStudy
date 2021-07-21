@@ -123,9 +123,60 @@ public class FoodManager {
 			       image=image.substring(0,image.lastIndexOf("^"));// 마지막 ^를 제거 
 			       image=image.replace("&", "#");
 			       StringTokenizer st=new StringTokenizer(image,"^");
+			       int k=1;
+			       while(st.hasMoreTokens())
+			       {
+			    	   System.out.println(k+"."+st.nextToken());
+			    	   k++;
+			       }
+			       // 한개 => Element , 여러개 => Elements
+			       /*
+			        *   <table class="info no_menu "> 
+                        <tr class="only-desktop"> 
+				      <th>주소</th> 
+				      <td>강원도 강릉시 옥가로 50<br/> 
+				      <span class="Restaurant__InfoAddress--Rectangle">지번</span> 
+				      <span class="Restaurant__InfoAddress--Text">
+				         강원도 강릉시 옥천동 219-11</span> 
+				      </td> 
+				    </tr>     <tr class="only-desktop"> 
+				      <th>전화번호</th> 
+				      <td>033-641-3601</td> 
+      					</tr>
+			        */
+			       Element address=doc2.select("table.info td").get(0);
+			       String addr=address.text();
+			       Element tel=doc2.select("table.info td").get(1);
+			       String phone=tel.text();
+			       Element type=doc2.select("table.info td").get(2);
+			       String tp=type.text();
+			       // 3,4,5,6
+			       ////////////////////////////////////////////////////
+			       String pr="";
+			       try
+			       {
+			          Element price=doc2.select("table.info th").get(3);
+			          String s=price.text();
+			          if(s.equals("가격대"))
+			          {
+			        	  Element pp=doc2.select("table.info td").get(3);
+			        	  pr=pp.text();
+			          }
+			       }catch(Exception ex)
+			       {
+			    	      pr="none";
+			       }
 			       
+			       //Element parking=doc2.selectFirst("");
+			       //Element time=doc2.selectFirst("");
+			       //Element menu=doc2.selectFirst("");
+			       ////////////////////////////////////////////////////
 			       System.out.println("업체명:"+title.text());
 			       System.out.println("점수:"+score.text());
+			       System.out.println("주소:"+addr);
+			       System.out.println("전화:"+phone);
+			       System.out.println("음식종류:"+tp);
+			       System.out.println("가격대:"+pr);
 			       System.out.println("===========================");
 			   }
 			   
