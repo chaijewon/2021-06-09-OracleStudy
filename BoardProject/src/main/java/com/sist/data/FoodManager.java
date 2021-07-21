@@ -2,6 +2,9 @@ package com.sist.data;
 // Jsoup=>웹에서 데이터 읽기
 import java.util.*;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -144,14 +147,13 @@ public class FoodManager {
 				      <td>033-641-3601</td> 
       					</tr>
 			        */
-			       Element address=doc2.select("table.info td").get(0);
+			       /*Element address=doc2.select("table.info td").get(0);
 			       String addr=address.text();
 			       Element tel=doc2.select("table.info td").get(1);
 			       String phone=tel.text();
 			       Element type=doc2.select("table.info td").get(2);
 			       String tp=type.text();
-			       // 3,4,5,6
-			       ////////////////////////////////////////////////////
+			       
 			       String pr="";
 			       try
 			       {
@@ -167,21 +169,115 @@ public class FoodManager {
 			    	      pr="none";
 			       }
 			       
+			       
 			       //Element parking=doc2.selectFirst("");
 			       //Element time=doc2.selectFirst("");
 			       //Element menu=doc2.selectFirst("");
+			        
+			        */
 			       ////////////////////////////////////////////////////
+			       String addr="no",phone="no",tp="no",pr="no",pa="no",ti="no",mu="no";
+			       Elements etc=doc2.select("table.info tr th");
+			       //System.out.println(etc);
+			       for(int a=0;a<etc.size();a++)
+			       {
+			    	   String ss=etc.get(a).text();
+			    	   if(ss.equals("주소"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   addr=e.text();
+			    	   }
+			    	   else if(ss.equals("전화번호"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   phone=e.text();
+			    	   }
+			    	   else if(ss.equals("음식 종류"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   tp=e.text();
+			    	   }
+			    	   else if(ss.equals("가격대"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   pr=e.text();
+			    	   }
+			    	   else if(ss.equals("주차"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   pa=e.text();
+			    	   }
+			    	   else if(ss.equals("영업시간"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   ti=e.text();
+			    	   }
+			    	   else if(ss.equals("메뉴"))
+			    	   {
+			    		   Element e=doc2.select("table.info td").get(a);
+			    		   mu=e.text();
+			    	   }
+			       }
 			       System.out.println("업체명:"+title.text());
 			       System.out.println("점수:"+score.text());
 			       System.out.println("주소:"+addr);
 			       System.out.println("전화:"+phone);
 			       System.out.println("음식종류:"+tp);
 			       System.out.println("가격대:"+pr);
+			       System.out.println("주차:"+pa);
+			       System.out.println("영업시간:"+ti);
+			       System.out.println("메뉴:"+mu);
 			       System.out.println("===========================");
+			       // 데이터베이스 저장 
+			       FoodHouseVO fvo=new FoodHouseVO();
+			       fvo.setCno(vo.getCno());
+			       fvo.setName(title.text());
+			       fvo.setScore(Double.parseDouble(score.text()));
+			       fvo.setAddress(addr);
+			       fvo.setTel(phone);
+			       fvo.setType(tp);
+			       fvo.setPrice(pr);
+			       fvo.setParking(pa);
+			       fvo.setTime(ti);
+			       fvo.setMenu(mu);
+			       fvo.setPoster(image);
+			       // 번호는 자동 증가 
+			       // <script id="reviewCountInfo" type="application/json">[{"action_value":1,"count":0},{"action_value":2,"count":3},{"action_value":3,"count":23}]</script>
+			       Element review=doc2.selectFirst("script#reviewCountInfo");
+			       // class(중복) => . , id(중복이 없다) => # => 태그 구분
+			       //System.out.println(review.data()); // script => data()
+			       String json=review.data();
+			       JSONParser jp=new JSONParser();
+			       JSONArray arr=(JSONArray)jp.parse(json);
+			       String good="",soso="",bad="";
+			       for(int b=0;b<arr.size();b++)
+			       {
+			    	   JSONObject obj=(JSONObject)arr.get(b);
+			    	   if(b==0)
+			    	   {
+			    		   bad=String.valueOf(obj.get("count"));
+			    	   }
+			    	   else if(b==1)
+			    	   {
+			    		   soso=String.valueOf(obj.get("count"));
+			    	   }
+			    	   else if(b==2)
+			    	   {
+			    		   good=String.valueOf(obj.get("count"));
+			    	   }
+			       }
+			       System.out.println("GOOD:"+good);
+			       System.out.println("SOSO:"+soso);
+			       System.out.println("BAD:"+bad);
+			       fvo.setGood(Integer.parseInt(good));
+			       fvo.setSoso(Integer.parseInt(soso));
+			       fvo.setBad(Integer.parseInt(bad));
+			       // 데이터베이스에 저장 
+			       dao.foodHouseInsert(fvo);
 			   }
 			   
 		   }
-	   }catch(Exception ex){}
+	   }catch(Exception ex){ex.printStackTrace();}
    }
 }
 
