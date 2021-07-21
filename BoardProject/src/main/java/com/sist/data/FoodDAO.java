@@ -1,7 +1,10 @@
 package com.sist.data;
 // 오라클 연결 
+/*
+ *  자바 + 오라클  => DAO  => 웹 핵심 
+ */
 import java.util.*;
-import java.sql.*;
+import java.sql.*; // JDBC => DBCP(Project) => ORM(Spring)
 public class FoodDAO {
    private Connection conn;// 오라클 연결 
    private PreparedStatement ps;// SQL전송 
@@ -197,8 +200,88 @@ public class FoodDAO {
 	   }
 	   return list;
    }
+   public FoodCategoryVO foodCategoryInfoData(int cno)
+   {
+	   FoodCategoryVO vo=new FoodCategoryVO();
+	   try
+	   {
+		   //1. 연결
+		   getConnection();
+		   //2. SQL
+		   String sql="SELECT title,subject "
+				     +"FROM food_category "
+				     +"WHERE cno="+cno;
+		   //3. 전송
+		   ps=conn.prepareStatement(sql);
+		   //4. 결과값 받기
+		   ResultSet rs=ps.executeQuery();
+		   //5. 출력위치체 커서 이동 
+		   rs.next();
+		   vo.setTitle(rs.getString(1));
+		   vo.setSubject(rs.getString(2));
+		   rs.close();
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection();
+	   }
+	   return vo;
+   }
+   // 카테고리별 맛집을 가지고 오는 SQL문장 
+   public ArrayList<FoodHouseVO> foodList(int cno)
+   {
+	   ArrayList<FoodHouseVO> list=new ArrayList<FoodHouseVO>();
+	   try
+	   {
+		   // 1. 열기
+		   getConnection();
+		   // 2. SQL문장 제작
+		   String sql="SELECT no,name,score,address,tel,REPLACE(poster,'#','&') "
+				     +"FROM food_house "
+				     +"WHERE cno="+cno
+				     +"ORDER BY no ASC";
+		   ps=conn.prepareStatement(sql);
+		   // 3. 실행 
+		   ResultSet rs=ps.executeQuery();
+		   // 4. 데이터를 => ArrayList에 담기
+		   while(rs.next())
+		   {
+			   FoodHouseVO vo=new FoodHouseVO();
+			   vo.setNo(rs.getInt(1));
+			   vo.setName(rs.getString(2));
+			   vo.setScore(rs.getDouble(3));
+			   vo.setAddress(rs.getString(4));
+			   vo.setTel(rs.getString(5));
+			   String s=rs.getString(6);
+			   s=s.substring(0,s.indexOf("^"));
+			   vo.setPoster(s);
+			   list.add(vo);
+		   }
+		   rs.close();
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace(); // 에러처리 
+	   }
+	   finally
+	   {
+		   disConnection();//오라클 닫기
+	   }
+	   return list;
+   }
+   // 맛집에 대한 상세보기 출력 
    
 }
+
+
+
+
+
+
+
+
 
 
 

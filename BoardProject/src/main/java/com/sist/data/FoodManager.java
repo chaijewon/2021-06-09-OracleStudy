@@ -127,6 +127,7 @@ public class FoodManager {
 			       image=image.replace("&", "#");
 			       StringTokenizer st=new StringTokenizer(image,"^");
 			       int k=1;
+			       
 			       while(st.hasMoreTokens())
 			       {
 			    	   System.out.println(k+"."+st.nextToken());
