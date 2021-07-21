@@ -103,6 +103,101 @@ public class FoodDAO {
 	   }
    }
    // 4-2. 망고플레이트 => 맛집 저장 
+   /*
+    *   NO      NOT NULL NUMBER         
+		CNO              NUMBER         
+		NAME    NOT NULL VARCHAR2(100)  
+		SCORE   NOT NULL NUMBER(2,1)    
+		ADDRESS NOT NULL VARCHAR2(200)  
+		TEL     NOT NULL VARCHAR2(20)   
+		TYPE    NOT NULL VARCHAR2(100)  
+		PRICE   NOT NULL VARCHAR2(100)  
+		PARKING NOT NULL VARCHAR2(100)  
+		TIME             VARCHAR2(30)   
+		MENU             VARCHAR2(2000) 
+		POSTER  NOT NULL VARCHAR2(1000) 
+		GOOD             NUMBER         
+		SOSO             NUMBER         
+		BAD              NUMBER  
+    */
+   public void foodHouseInsert(FoodHouseVO vo)
+   {
+	   try
+	   {
+		   //1.오라클 연결
+		   getConnection(); // 메소드 시점 => 기능 수행(한가지만 수행) , 반복적으로 호출 
+		   //2. SQL문장을 만든다 
+		   String sql="INSERT INTO food_house VALUES("
+				     +"(SELECT NVL(MAX(no)+1,1) FROM food_house),"
+				     +"?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		   //3. SQL문장을 오라클 전송 
+		   ps=conn.prepareStatement(sql);
+		   //4. ?에 값을 채운다 
+		   ps.setInt(1, vo.getCno()); // '' 사용하지 않는다 
+		   ps.setString(2, vo.getName());
+		   ps.setDouble(3, vo.getScore());
+		   ps.setString(4, vo.getAddress());
+		   ps.setString(5, vo.getTel());
+		   ps.setString(6, vo.getType());
+		   ps.setString(7, vo.getPrice());
+		   ps.setString(8, vo.getParking());
+		   ps.setString(9, vo.getTime());
+		   ps.setString(10, vo.getMenu());
+		   ps.setString(11, vo.getPoster());
+		   ps.setInt(12, vo.getGood());
+		   ps.setInt(13, vo.getSoso());
+		   ps.setInt(14, vo.getBad());
+		   //5. 오라클에 실행 명령을 내린다 
+		   ps.executeUpdate(); // commit() => AutoCommit()
+		   //6. => 속도 (레시피(15만개)) => 나눠서 작업 (쓰레드)
+		   
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace(); // 에러처리 
+	   }
+	   finally
+	   {
+		   disConnection(); // 오라클 닫기
+	   }
+   }
+   // 4-3. INDEX (데이터 작거나 , 수시로 변경 (X)) => 검색 (카테고리 출력)
+   public ArrayList<FoodCategoryVO> foodCategoryListData()
+   {
+	   ArrayList<FoodCategoryVO> list=new ArrayList<FoodCategoryVO>();
+	   try
+	   {
+		   //1. 열기 
+		   getConnection();
+		   //2. SQL문장
+		   String sql="SELECT cno,title,subject,poster,link "
+				     +"FROM food_category "
+				     +"ORDER BY cno";
+		   //3. SQL문장 실행 
+		   ps=conn.prepareStatement(sql); 
+		   //4. 실행하고 결과값 받기 
+		   ResultSet rs=ps.executeQuery();
+		   while(rs.next()) //  출력 첫번째부터 
+		   {
+			   FoodCategoryVO vo=new FoodCategoryVO();
+			   vo.setCno(rs.getInt(1));
+			   vo.setTitle(rs.getString(2));
+			   vo.setSubject(rs.getString(3));
+			   vo.setPoster(rs.getString(4));
+			   vo.setLink("https://www.mangoplate.com"+rs.getString(5));
+			   list.add(vo);
+		   }
+		   rs.close();
+	   }catch(Exception ex)
+	   {
+		   ex.printStackTrace();
+	   }
+	   finally
+	   {
+		   disConnection(); // 닫기 
+	   }
+	   return list;
+   }
+   
 }
 
 
