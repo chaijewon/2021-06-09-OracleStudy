@@ -22,7 +22,19 @@ public class MusicList extends HttpServlet {
 		PrintWriter out=response.getWriter();
 		// 데이터 읽기 
 		GenieDAO dao=new GenieDAO();
-		ArrayList<GenieVO> list=dao.genieListData(1);
+		//1. 사용자가 요청한 페이지를 받는다 
+		// MusicList?page=1
+		// http://localhost:8080/PageingProject/MusicList
+		String strPage=request.getParameter("page");
+		// 처음에 실행시에 페이지를 받지 못한다 
+		// MusicList   ==> null
+		// MusicList?page=  => " " => strPage.equals(" ")
+		if(strPage==null)
+			strPage="1"; // default 
+		int curpage=Integer.parseInt(strPage);
+		ArrayList<GenieVO> list=dao.genieListData(curpage);
+		// 총페이지 
+		int totalpage=dao.genieTotalPage();
 		out.println("<html>");
 		out.println("<head>");
 		// CSS등록 / JavaScript등록 
@@ -82,14 +94,28 @@ public class MusicList extends HttpServlet {
 		out.println("</tr>");// 타이틀바 
 		for(GenieVO vo:list)
 		{
+			
+			// GenieDetail이동 => 필요한 데이터를 넘겨준다 ?변수=값
 			out.println("<tr>");
 			out.println("<td class=text-center>"+vo.getNo()+"</td>");
 			out.println("<td class=text-center><img src="+vo.getPoster()+" width=30 height=30></td>");
-			out.println("<td>"+vo.getTitle()+"</td>");
+			out.println("<td><a href=GenieDetail?no="+vo.getNo()+">");
+			out.println(vo.getTitle());
+			out.println("</a></td>");
 			out.println("<td>"+vo.getSinger()+"</td>");
 			out.println("<td>"+vo.getAlbum()+"</td>");
 			out.println("</tr>");
+			
 		}
+		out.println("</table>");
+		out.println("<table class=table>");
+		out.println("<tr>");
+		out.println("<td class=text-center>");
+		out.println("<a href=MusicList?page="+(curpage>1?curpage-1:curpage)+" class=\"btn btn-sm btn-danger\">이전</a>");
+		out.println(curpage +" page / "+totalpage+" pages");
+		out.println("<a href=MusicList?page="+(curpage<totalpage?curpage+1:curpage)+" class=\"btn btn-sm btn-success\">다음</a>");
+		out.println("</td>");
+		out.println("</tr>");
 		out.println("</table>");
 		out.println("</div>");
 		out.println("</div>");

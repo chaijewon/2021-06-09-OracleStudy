@@ -70,11 +70,13 @@ public class GenieDAO {
 				// 1. 연결
 				getConnection();
 				// 2. SQL문장을 만든다 
-				String sql="SELECT no,poster,title,singer,album,state,idcrement,key,num "
-						  +"FROM (SELECT no,poster,title,singer,album,state,idcrement,key,rownum as num "
-						  +"FROM (SELECT no,poster,title,singer,album,state,idcrement,key "
-						  +"FROM genie_cjw ORDER BY no ASC)) "
+				String sql="SELECT no,poster,title,singer,album,num "
+						  +"FROM (SELECT no,poster,title,singer,album,rownum as num "
+						  +"FROM (SELECT no,poster,title,singer,album "
+						  +"FROM music_view ORDER BY no ASC)) "
 						  +"WHERE num BETWEEN ? AND ?";
+				// 오라클 => 인라인뷰 
+				// 자바 => while => 전체 200개에서 20만 추출 => 20 15만개 
 				/*
 				 *   1page  => 1 ~ 20
 				 *   2page  => 21 ~ 40
@@ -101,9 +103,10 @@ public class GenieDAO {
 				    	vo.setTitle(rs.getString(3));
 				    	vo.setSinger(rs.getString(4));
 				    	vo.setAlbum(rs.getString(5));
-				    	vo.setState(rs.getString(6));
-				    	vo.setIdcrement(rs.getInt(7));
-				    	vo.setKey(rs.getString(8));
+						/*
+						 * vo.setState(rs.getString(6)); vo.setIdcrement(rs.getInt(7));
+						 * vo.setKey(rs.getString(8));
+						 */
 				    	list.add(vo);
 				}
 				rs.close();
@@ -118,7 +121,8 @@ public class GenieDAO {
 			}
 			return list;
 		}
-		// 총페이지 구하기
+		// 총페이지 구하기 (view => table+table) => table (가상) => 처리는 동일하다 
+		// FROM table_name|view_name
 		public int genieTotalPage()
 		{
 			int total=0;
@@ -127,7 +131,7 @@ public class GenieDAO {
 				// 1. 연결
 				getConnection();
 				// 2. SQL문장
-				String sql="SELECT CEIL(COUNT(*)/20.0) FROM genie_cjw";
+				String sql="SELECT CEIL(COUNT(*)/20.0) FROM music_view";
 				// 3. 실행 
 				ps=conn.prepareStatement(sql);
 				ResultSet rs=ps.executeQuery();
@@ -148,7 +152,56 @@ public class GenieDAO {
 		}
 	 // 사람 => 한눈에 볼 수 있는 (10~20) => 모바일 
 	 // 기술면접 => 페이징기법 , 게시판 (제작 시간)
-	 // 5. SQL문장을 단순화 => 복합뷰 (조인) => 지니뮤직(동영상(X),멜론(동영상))
+	 // 5. SQL문장을 단순화 => 복합뷰 (조인) => 지니뮤직(동영상(X),멜론(동영상)) 
+		/*
+		 *  CREATE OR REPLACE VIEW music_view
+            AS
+		    SELECT gc.no,gc.title,gc.singer,gc.album,mc.key,gc.idcrement,gc.state,gc.poster
+		    FROM genie_cjw gc,melon_cjw mc
+		    WHERE gc.title=mc.title;
+		    
+		    SELECT * FROM music_view
+		 */
+	public GenieVO genieDetailData(int no)
+	{
+		GenieVO vo=new GenieVO();
+		try
+		{
+			// 1. 연결
+			getConnection();
+			// 2. SQL문장 
+			// 
+			   
+			/*
+			 *   String sql="SELECT gc.no,gc.title,gc.singer,gc.album,mc.key,"
+			 *             +"gc.idcrement,gc.state,gc.poster "
+                           +"FROM genie_cjw gc,melon_cjw mc "
+                           +"WHERE gc.title=mc.title"
+			 */
+			String sql="SELECT no,title,singer,album,key "
+					  +"FROM music_view "
+					  +"WHERE no="+no;
+			ps=conn.prepareStatement(sql);
+			ResultSet rs=ps.executeQuery();
+			rs.next();
+			
+			vo.setNo(rs.getInt(1));
+			vo.setTitle(rs.getString(2));
+			vo.setSinger(rs.getString(3));
+			vo.setAlbum(rs.getString(4));
+			vo.setKey(rs.getString(5));
+			rs.close();
+			
+		}catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		finally
+		{
+			disConnection();
+		}
+		return vo;
+	}
 	 
 	 
 	 
