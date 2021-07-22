@@ -177,6 +177,14 @@ public class GenieDAO {
 			 *             +"gc.idcrement,gc.state,gc.poster "
                            +"FROM genie_cjw gc,melon_cjw mc "
                            +"WHERE gc.title=mc.title"
+                  view => SELECT문장을 가지고 있다 
+                  
+                  SELECT no,title,singer,album,key
+                  FROM (SELECT gc.no,gc.title,gc.singer,gc.album,mc.key,
+                        gc.idcrement,gc.state,gc.poster
+                        FROM genie_cjw gc,melon_cjw mc
+                        WHERE gc.title=mc.title)
+                  WHERE no=10     
 			 */
 			String sql="SELECT no,title,singer,album,key "
 					  +"FROM music_view "
