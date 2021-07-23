@@ -52,7 +52,7 @@ public class GenieDAO {
 		 }
 	 // 4. 기능 설정 (인라뷰를 이용해서 페이지 나누는 방법) => 웹 70% 페이지 나누기 
 		 /*
-		  * NO        NOT NULL NUMBER         
+		  *  NO        NOT NULL NUMBER         
 			 POSTER             VARCHAR2(1000) 
 			 TITLE              VARCHAR2(200)  
 			 SINGER             VARCHAR2(100)  
