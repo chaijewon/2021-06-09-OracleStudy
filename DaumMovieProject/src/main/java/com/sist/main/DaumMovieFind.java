@@ -1,19 +1,25 @@
 package com.sist.main;
 
+// apache에서 만든 라이브러리 => jakarta.~ 톰캣 10버젼
+// 10버젼 이하 => javax => 8.5 , 9.0 
 import java.io.*;
+import java.util.ArrayList;
+
+import com.sist.dao.DaumMovieVO;
+import com.sist.dao.MovieDAO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.*;
-import com.sist.dao.*;
-@WebServlet("/DaumMovieList")
-public class DaumMovieList extends HttpServlet {
+
+@WebServlet("/DaumMovieFind")
+public class DaumMovieFind extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-          // Servlet => 웹에서 실행하는 자바파일 (웹 보안이 필요한 경우 , 소스를 공개하지 않는 경우)		
+        // Servlet => 웹에서 실행하는 자바파일 (웹 보안이 필요한 경우 , 소스를 공개하지 않는 경우)		
 	      // JSP => 웹에서 실행되는 파일 (보안이 없다 , 전체 소스가 공개 => View)
 		  // Spring => 웹관련 라이브러리 => 서블릿 => (소스를 공개하지 않는다)
 		  /*
@@ -28,11 +34,12 @@ public class DaumMovieList extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		// 메모리 저장 => HTML을 저장 => 브라우저 읽어간다 
 		PrintWriter out=response.getWriter(); // response에는 서버에 접속한 사용자 IP
-		String strCno=request.getParameter("cno");
-		if(strCno==null)
-			strCno="1"; // Default 설정 (1)
+		
+		String fs=request.getParameter("fs"); // title,genre
+		String ss=request.getParameter("ss");
+		System.out.println("ss="+ss);
 		MovieDAO dao=new MovieDAO();
-		ArrayList<DaumMovieVO> list=dao.daumMovieListData(Integer.parseInt(strCno));
+		ArrayList<DaumMovieVO> list=dao.daumMovieFindData(fs, ss);
 		// HTML을 출력 => 해당 사용자가 읽어 간다 
 		out.println("<html>"); // ML <a> , </a> , <br/> => XML,WML , HDML ...
 		// HTML은 이미 태그가 만들어져 있다 
@@ -48,23 +55,27 @@ public class DaumMovieList extends HttpServlet {
 		out.println("<div class=container>"); // container/wrap
 		out.println("<div class=row>");
 		// 출력하는 내용은 브라우저 가운데 출력 => margin:0px auto => center 정렬
-		out.println("<a href=DaumMovieList?cno=1 class=\"btn btn-lg btn-danger\">영화순위</a>");
-		out.println("<a href=DaumMovieList?cno=2 class=\"btn btn-lg btn-success\">박스오피스</a>");
-		out.println("<a href=DaumMovieList?cno=5 class=\"btn btn-lg btn-info\">OTT</a>");
-		out.println("<a href=DaumMovieList?cno=6 class=\"btn btn-lg btn-warning\">넷플릭스</a>");
-		out.println("<a href=DaumMovieList?cno=7 class=\"btn btn-lg btn-primary\">왓차</a>");
-		out.println("<a href=DaumMovieList?cno=8 class=\"btn btn-lg btn-default\">카카오페이지</a>");
 		out.println("</div>");
-		
+		out.println("<form action=DaumMovieFind>");
+		out.println("<select name=fs class=input-sm>");
+		out.println("<option value=title>영화명</option>");
+		out.println("<option value=genre>장르</option>");
+		out.println("</select>");
+		out.println("<input type=text name=ss class=input-sm size=15>");
+		out.println("<input type=submit value=검색 class=\"btn btn-danger btn-sm\">");
+		out.println("</form>"); // 데이터 전송 
 		out.println("<div style=\"height:30px\"></div>");// 간격
 		out.println("<div class=row>");
 		// 영화 목록 
-		for(DaumMovieVO vo:list)
+		if(list!=null)
 		{
-			out.println("<div class=col-sm-2>");// 3 3 3 3  => 다음
-			// 2 2 2 2 2 2 => 다음 4 4 4
-			out.println("<img src="+vo.getPoster()+" width=100% title=\""+vo.getTitle()+"\">");
-			out.println("</div>");
+			for(DaumMovieVO vo:list)
+			{
+				out.println("<div class=col-sm-2>");// 3 3 3 3  => 다음
+				// 2 2 2 2 2 2 => 다음 4 4 4
+				out.println("<img src="+vo.getPoster()+" width=100% title=\""+vo.getTitle()+"\">");
+				out.println("</div>");
+			}
 		}
 		out.println("</div>");
 		out.println("</div>");
@@ -74,13 +85,3 @@ public class DaumMovieList extends HttpServlet {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-

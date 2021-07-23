@@ -265,6 +265,19 @@ public class MovieDAO {
     		 *        ps.setString(1,"title") => WHERE 'title' LIKE '%'¾Æ'%'
     		 *        ps.setString(2,"¾Æ")
     		 */
+    		ps=conn.prepareStatement(sql);
+    		ps.setString(1, ss);
+    		
+    		ResultSet rs=ps.executeQuery();
+    		while(rs.next())
+    		{
+    			DaumMovieVO vo=new DaumMovieVO();
+    			vo.setMno(rs.getInt(1));
+    			vo.setPoster(rs.getString(2));
+    			vo.setTitle(rs.getString(3));
+    			list.add(vo);
+    		}
+    		rs.close();
     	}catch(Exception ex)
     	{
     		ex.printStackTrace();
