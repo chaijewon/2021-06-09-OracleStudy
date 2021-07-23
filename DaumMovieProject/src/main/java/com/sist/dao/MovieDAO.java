@@ -109,6 +109,172 @@ public class MovieDAO {
     		disConnection(); // 연결 해제 
     	}
     }
+    // 데이터 읽기 
+    public ArrayList<DaumMovieVO> daumMovieListData(int cno)
+    {
+    	ArrayList<DaumMovieVO> list=new ArrayList<DaumMovieVO>();
+    	try
+    	{
+    		// 1. 연결
+    		getConnection();
+    		// 2. SQL문장 
+    		String sql="SELECT /*+ INDEX_ASC(daum_movie dm_mno_pk) */ mno,poster,title FROM daum_movie "
+    				  +"WHERE cno="+cno;
+    		// 3. SQL문장 전송
+    		ps=conn.prepareStatement(sql);
+    		// 4. SQL문장 실행후 결과값 받기
+    		ResultSet rs=ps.executeQuery();
+    		// 5. 저장된 메모리부터 데이터를 읽어서 ArrayList에 채운다 
+    		while(rs.next())
+    		{
+    			DaumMovieVO vo=new DaumMovieVO();
+    			vo.setMno(rs.getInt(1));
+    			vo.setPoster(rs.getString(2));
+    			vo.setTitle(rs.getString(3));
+    			list.add(vo);
+    		}
+    		// 6. 메모리 닫는다 rs.close()
+    		rs.close();
+    	}catch(Exception ex)
+    	{
+    		ex.printStackTrace();
+    	}
+    	finally
+    	{
+    		disConnection();
+    	}
+    	return list;
+    }
+    public void daumMovieScoreAvg()
+    {
+    	try
+    	{
+    		getConnection();
+    		String sql="SELECT cno,ROUND(AVG(score),2) FROM dm "
+    				  +"GROUP BY cno "
+    				  +"ORDER BY cno";
+    		ps=conn.prepareStatement(sql);
+    		ResultSet rs=ps.executeQuery();
+    		while(rs.next())
+    		{
+    			System.out.println(rs.getInt(1)+","+rs.getDouble(2));
+    		}
+    		rs.close();
+    	}catch(Exception ex)
+    	{
+    		ex.printStackTrace();
+    	}
+    	finally
+    	{
+    		disConnection();
+    	}
+    }
+    // 상세보기 
+    public DaumMovieVO daumMovieDetailData(int mno)
+    {
+    	// mno => Primary Key (중복없는 데이터)
+    	DaumMovieVO vo=new DaumMovieVO();
+    	try
+    	{
+    		//1. 연결 getConnection()
+    		getConnection();
+    		//2. SQL문장 String sql=""
+    		String sql="SELECT mno,title,poster,genre,grade,nation,showUser,"
+    				  +"score,story,time,regdate "
+    				  +"FROM dm "
+    				  +"WHERE mno=?";
+    		//3. SQL전송 ps=conn.preparedStatement(sql)
+    		ps=conn.prepareStatement(sql);
+    		//4. 필요한 데이터가 있는 경우 (?) 값을 채운다 ps.setInt(1,1)
+    		ps.setInt(1, mno);
+    		//5. 실행후 결과값을 받는다  ResultSet rs=ps.executeQuery()
+    		ResultSet rs=ps.executeQuery();
+    		//6. VO에 값을 채운다  rs.next() vo.setMno(...)
+    		rs.next();
+    		vo.setMno(rs.getInt(1));
+    		vo.setTitle(rs.getString(2));
+    		vo.setPoster(rs.getString(3));
+    		vo.setGenre(rs.getString(4));
+    		vo.setGrade(rs.getString(5));
+    		vo.setNation(rs.getString(6));
+    		vo.setShowUser(rs.getString(7));
+    		vo.setScore(rs.getDouble(8));
+    		vo.setStory(rs.getString(9));
+    		vo.setTime(rs.getString(10));
+    		vo.setRegdate(rs.getString(11));
+    		//7. 메모리 닫기  rs.close()
+    		rs.close();
+    	}catch(Exception ex)
+    	{
+    		ex.printStackTrace();
+    	}
+    	finally
+    	{
+    		disConnection();
+    	}
+    	return vo;
+    }
+    public static void main(String[] args) {
+		MovieDAO dao=new MovieDAO();
+		//dao.daumMovieScoreAvg();
+		Scanner scan=new Scanner(System.in);
+		System.out.println("영화순위(1)");
+		System.out.println("박스오피스-주간(2)");
+		System.out.println("박스오피스-월간(3)");
+		System.out.println("박스오피스-년간(4)");
+		System.out.println("OTT(5)");
+		System.out.println("넷플렉스(6)");
+		System.out.println("왓차(7)");
+		System.out.println("카카오페이지(8)");
+		System.out.println("================");
+		System.out.print("메뉴 선택:");
+		int menu=scan.nextInt();
+		ArrayList<DaumMovieVO> list=dao.daumMovieListData(menu);
+		for(DaumMovieVO vo:list)
+		{
+			System.out.println(vo.getTitle());
+		}
+		System.out.println("상세볼 영화 선택(1~183):");
+		int mno=scan.nextInt();
+		DaumMovieVO vo=dao.daumMovieDetailData(mno);
+		System.out.println(vo.getMno());
+		System.out.println(vo.getTitle());
+		System.out.println(vo.getGenre());
+		System.out.println(vo.getGrade());
+		System.out.println(vo.getNation());
+		System.out.println(vo.getTime());
+		System.out.println(vo.getShowUser());
+		System.out.println(vo.getScore());
+		System.out.println(vo.getRegdate());
+				
+	}
+    // 찾기 => LIKE  => 목록 출력 , 상세보기 , 찾기 
+    public ArrayList<DaumMovieVO> daumMovieFindData(String fs,String ss)
+    {
+    	// title , genre , grade
+    	ArrayList<DaumMovieVO> list=new ArrayList<DaumMovieVO>();
+    	try
+    	{
+    		getConnection();
+    		String sql="SELECT mno,poster,title "
+    				  +"FROM dm "
+    				  +"WHERE "+fs+" LIKE '%'||?||'%'";
+    		/*
+    		 *        "WHERE ? LIKE '%'||?||'%'"
+    		 *        
+    		 *        ps.setString(1,"title") => WHERE 'title' LIKE '%'아'%'
+    		 *        ps.setString(2,"아")
+    		 */
+    	}catch(Exception ex)
+    	{
+    		ex.printStackTrace();
+    	}
+    	finally
+    	{
+    		disConnection();
+    	}
+    	return list;
+    }
 }
 
 
