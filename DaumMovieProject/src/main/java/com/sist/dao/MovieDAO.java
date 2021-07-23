@@ -70,7 +70,7 @@ public class MovieDAO {
     		// 1. 연결
     		getConnection();
     		// 2. SQL문장 
-    		String sql="INSERT INTO duam_movie VALUES("
+    		String sql="INSERT INTO daum_movie VALUES("
     				  +"daum_mno_seq.nextval,?,?,?,?,?,?,?,?,?,?,?)";
     		// Sequence의 단점 
     		// daum_mno_seq.nextval => SELECT MAX(mno)+1 FROM daum_movie
